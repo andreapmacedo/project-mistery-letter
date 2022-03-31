@@ -1,37 +1,52 @@
 const btnGenerateLetter = document.getElementById('criar-carta');
 const inputTextField = document.getElementById('carta-texto');
 const generatedLetter = document.getElementById('carta-gerada');
-//- Logica para verificação dos requisitos e montagem da carta.
-function generateLetter() {
-  //-- Remover as tags `span` caso existam.
-  while (generatedLetter.firstChild) {
-    generatedLetter.removeChild(generatedLetter.firstChild);
-  }
-  //-- quebra a frase em palavras e adiciona em uma lista.
-  let sentence = (inputTextField.value).split(' ');
-  // O código abaixo foi pesquisado em: https://pt.stackoverflow.com/questions/484146/como-contar-ocorr%C3%AAncias-de-um-valor-dentro-de-um-array
-  //-- conta a quantidade de `spaces bars` para verificar se a sentença é formada só por este tipo de caracter
-  let countSpaceBar = sentence.filter(x => x == "").length;
-  //-- Caso a sentença seja válida, cria os elementos `span` que construirão a carta.
-  if (sentence.length > 0 && countSpaceBar < sentence.length) {
-    for (let i in sentence)
-    {
-      createSpan(sentence[i]);
-    }
-  } else {
-    createSpan('Por favor, digite o conteúdo da carta.');
-  }
-  
-}
-//-- Adiciona os elementos `span` ao seu pai `p`
-function createSpan(phrase){
-  const node = document.createElement('span');
-  node.innerText = phrase;
-  // node.innerHTML = phrase;
-  generatedLetter.appendChild(node);
-}
-//-- Coloca as funções de evento `em escuta` ao carregar a página no nagegador
-window.onload = function () {
-  btnGenerateLetter.addEventListener('click', generateLetter);
+const letterCounter = document.querySelector('#carta-contador');
+const size = ['medium', 'big', 'reallybig'];
+const rotation = ['rotateleft', 'rotateright'];
+const style = ['newspaper', 'magazine1', 'magazine2'];
+const inclination = ['skewleft', 'skewright'];
 
+function totalWords() {
+  letterCounter.innerText = generatedLetter.children.length;
 }
+
+function addRandomClass() {
+  const rdmSz = Math.floor(Math.random() * (size.length - 0) + 0);
+  const rdmRt = Math.floor(Math.random() * (rotation.length - 0) + 0);
+  const rdmInc = Math.floor(Math.random() * (inclination.length - 0) + 0);
+  const rdmStl = Math.floor(Math.random() * (style.length - 0) + 0);
+  const lClasses = `${size[rdmSz]} ${rotation[rdmRt]} ${inclination[rdmInc]} ${style[rdmStl]}`;
+  // console.log(lClasses);
+  return lClasses;
+}
+
+function resetClasses(event) {
+  const spanLetter = event.target;
+  spanLetter.className = '';
+  spanLetter.className = addRandomClass();
+}
+
+function createSpan(letter) {
+  const spanLetter = document.createElement('span');
+  spanLetter.innerText = letter;
+  spanLetter.className = addRandomClass();
+  spanLetter.addEventListener('click', resetClasses);
+  generatedLetter.appendChild(spanLetter);
+}
+
+function generateLetter() {
+  generatedLetter.innerHTML = '';
+  const input = inputTextField.value;
+  const wordsArray = (input).split(' ');
+  if (input === null || input === '' || input === ' ') {
+    generatedLetter.innerHTML = 'Por favor, digite o conteúdo da carta.';
+  } else {
+    wordsArray.forEach((word) => createSpan(word));
+  }
+  totalWords();
+}
+
+window.onload = () => {
+  btnGenerateLetter.addEventListener('click', generateLetter);
+};
